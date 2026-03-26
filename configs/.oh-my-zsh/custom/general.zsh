@@ -1,0 +1,3 @@
+zsource() {
+  source "$HOME/.zshrc"
+}

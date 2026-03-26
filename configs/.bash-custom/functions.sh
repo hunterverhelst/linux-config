@@ -1,0 +1,3 @@
+bsource() {
+  source "$HOME/.bashrc"
+}
