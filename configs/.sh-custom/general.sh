@@ -1,6 +1,4 @@
-bsource() {
-  source "$HOME/.bashrc"
-}
+
 
 mkcd() {
     TARGET_DIR=$1
