@@ -45,7 +45,7 @@ if [ -n "$five_hour_pct" ]; then
   if [ -n "$five_hour_resets_at" ]; then
     # BSD date: -r <epoch> converts epoch seconds to local time
     # Strip leading zero from hour and lowercase am/pm for compact display (e.g. 5:30pm)
-    reset_time=$(date -r "$five_hour_resets_at" +%I:%M%p 2>/dev/null | sed 's/^0//;s/AM/am/;s/PM/pm/')
+    reset_time=$( { date -r "$five_hour_resets_at" +%I:%M%p 2>/dev/null || date -d "@$five_hour_resets_at" +%I:%M%p 2>/dev/null; } | sed 's/^0//;s/AM/am/;s/PM/pm/')
     # Elapsed % of the 5-hour (18000s) window — same value used in pace calc
     now=$(date +%s)
     elapsed=$((18000 - (five_hour_resets_at - now)))
@@ -112,7 +112,8 @@ if [ "$color" = "31" ] && [ -n "$elapsed" ] && [ "$elapsed" -gt 0 ]; then
     else
       etr_dur="${etr_m}m"
     fi
-    etr_time=$(date -r $((now + etr_secs)) +%I:%M%p 2>/dev/null | sed 's/^0//;s/AM/am/;s/PM/pm/')
+    etr_target=$((now + etr_secs))
+    etr_time=$( { date -r "$etr_target" +%I:%M%p 2>/dev/null || date -d "@$etr_target" +%I:%M%p 2>/dev/null; } | sed 's/^0//;s/AM/am/;s/PM/pm/')
     etr_part=$' \033[22;31mETR:'"${etr_dur}"$' ('"${etr_time}"$')\033[0m\033[2m'
   fi
 fi
