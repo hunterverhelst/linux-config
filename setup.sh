@@ -212,7 +212,7 @@ fi
 #   ~/.zsh-local   - sourced by .zshrc only
 # Each is optional; rc files skip missing directories silently.
 # ---------------------------------------------------------------------------
-for _dir in "$HOME/.sh-local" "$HOME/.bash-local" "$HOME/.zsh-local"; do
+for _dir in "$HOME/.sh-local" "$HOME/.bash-local" "$HOME/.zsh-local" "$HOME/.zsh-local/pre"; do
     if [ ! -d "$_dir" ]; then
         mkdir -p "$_dir"
         printf 'Created %s for per-device shell configs.\n' "$_dir"
