@@ -205,4 +205,19 @@ else
     printf 'Warning: configs folder not found in repo. Skipping.\n' >&2
 fi
 
+# ---------------------------------------------------------------------------
+# Scaffold per-device local config directories (not tracked in repo).
+#   ~/.sh-local    - sourced by both .bashrc and .zshrc
+#   ~/.bash-local  - sourced by .bashrc only
+#   ~/.zsh-local   - sourced by .zshrc only
+# Each is optional; rc files skip missing directories silently.
+# ---------------------------------------------------------------------------
+for _dir in "$HOME/.sh-local" "$HOME/.bash-local" "$HOME/.zsh-local"; do
+    if [ ! -d "$_dir" ]; then
+        mkdir -p "$_dir"
+        printf 'Created %s for per-device shell configs.\n' "$_dir"
+    fi
+done
+unset _dir
+
 printf 'Setup complete.\n'

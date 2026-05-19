@@ -52,3 +52,27 @@ if [ -d "$HOME/.sh-custom" ]; then
     done
     unset file
 fi
+
+# ---------------------------------------------------------------------------
+# Source local (per-device) configs - not tracked in repo
+# ---------------------------------------------------------------------------
+if [ -d "$HOME/.sh-local" ]; then
+    for file in "$HOME/.sh-local"/*.sh; do
+        [ -f "$file" ] && . "$file"
+    done
+    unset file
+fi
+
+if [ -d "$HOME/.bash-local" ]; then
+    for file in "$HOME/.bash-local"/*.sh; do
+        [ -f "$file" ] && . "$file"
+    done
+    unset file
+fi
+
+if [ -d "$HOME/.zsh-local" ]; then
+    for file in "$HOME/.zsh-local"/*.sh "$HOME/.zsh-local"/*.zsh; do
+        [ -f "$file" ] && . "$file"
+    done
+    unset file
+fi
