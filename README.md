@@ -3,7 +3,7 @@ Collection of setup scripts and configs so I can quickly configure a new Linux e
 
 ## Install
 
-Then run the script
+Interactive install
 ```sh
 curl -fsSL https://raw.githubusercontent.com/hunterverhelst/linux-config/refs/heads/main/setup.sh | sh
 ```
