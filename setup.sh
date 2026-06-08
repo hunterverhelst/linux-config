@@ -82,6 +82,11 @@ if [ "$DO_INSTALL" = true ]; then
     if ! has_cmd git; then
         pkg_install git
     fi
+
+    # Install stow first so it can be used for config setup
+    if ! has_cmd stow; then
+		pkg_install stow
+    fi
 fi
 
 # ---------------------------------------------------------------------------
@@ -112,6 +117,7 @@ fi
 if [ "$DO_INSTALL" = true ]; then
     if [ "${USE_FETCH:-false}" = true ]; then
         fetch_file "$RAW_URL/packages.lst" "$REPO_DIR/packages.lst"
+        fetch_file "$RAW_URL/pipx-packages.lst" "$REPO_DIR/pipx-packages.lst"
     fi
 
     # Read package list, skip blank lines.
@@ -127,6 +133,19 @@ if [ "$DO_INSTALL" = true ]; then
         # shellcheck disable=SC2086
         pkg_install $pkgs
     fi
+    pkgs=""
+    while IFS= read -r pkg || [ -n "$pkg" ]; do
+        case "$pkg" in
+            "") continue ;;
+        esac
+        pkgs="$pkgs $pkg"
+    done < "$REPO_DIR/pipx-packages.lst"
+    pipx ensurepath
+    if [ -n "$pkgs" ]; then
+        # shellcheck disable=SC2086
+        pipx install $pkgs
+    fi
+
 
     # Generate en_US.UTF-8 locale if locales is available.
     if has_cmd locale-gen; then

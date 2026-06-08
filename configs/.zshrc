@@ -16,7 +16,7 @@ plugins=(
     urltools
 )
 
-export ZSH_COLORIZE_TOOL=chroma
+export ZSH_COLORIZE_TOOL=pygmentize
 
 # ---------------------------------------------------------------------------
 # Pre-OMZ local hooks (per-device, not tracked in repo).

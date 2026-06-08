@@ -11,3 +11,5 @@ xclip
 zip
 zsh
 neovim
+python3
+pipx
