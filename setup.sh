@@ -9,6 +9,7 @@ CLONE_DIR="$HOME/.linux-config"
 LOCAL_MODE=false
 CAN_INSTALL=false
 DO_INSTALL=false
+FORCE_INSTALL=false
 USE_SUDO=""
 
 # ---------------------------------------------------------------------------
@@ -16,7 +17,8 @@ USE_SUDO=""
 # ---------------------------------------------------------------------------
 for arg in "$@"; do
     case "$arg" in
-        -local) LOCAL_MODE=true ;;
+        -local)   LOCAL_MODE=true ;;
+        -install) FORCE_INSTALL=true ;;
         *) printf 'Unknown option: %s\n' "$arg" >&2; exit 1 ;;
     esac
 done
@@ -48,28 +50,44 @@ fetch_file() {
 }
 
 # ---------------------------------------------------------------------------
-# Determine install capability
-# ---------------------------------------------------------------------------
-if [ "$(id -u)" -eq 0 ]; then
-    CAN_INSTALL=true
-    USE_SUDO=""
-elif has_cmd sudo && sudo -n true 2>/dev/null; then
-    CAN_INSTALL=true
-    USE_SUDO="sudo"
-else
-    CAN_INSTALL=false
-fi
-
-# ---------------------------------------------------------------------------
 # Ask user about installing packages
+#   -install forces installs (useful for non-interactive runs).
+#   Otherwise prompt via /dev/tty so this works under `curl ... | sh`,
+#   where stdin is the script body rather than the terminal.
 # ---------------------------------------------------------------------------
-if [ "$CAN_INSTALL" = true ]; then
+if [ "$FORCE_INSTALL" = true ]; then
+    DO_INSTALL=true
+elif [ -e /dev/tty ]; then
     printf 'Would you like to install packages? [Y/n] '
-    read -r answer
+    read -r answer </dev/tty
     case "$answer" in
         [nN]|[nN][oO]) DO_INSTALL=false ;;
         *)              DO_INSTALL=true  ;;
     esac
+else
+    DO_INSTALL=false
+fi
+
+# ---------------------------------------------------------------------------
+# Determine install capability (only if the user wants to install)
+# ---------------------------------------------------------------------------
+if [ "$DO_INSTALL" = true ]; then
+    if [ "$(id -u)" -eq 0 ]; then
+        CAN_INSTALL=true
+        USE_SUDO=""
+    elif has_cmd sudo && sudo -v 2>/dev/null; then
+        # sudo -v prompts for a password if needed and caches the
+        # credentials, so later non-interactive sudo calls succeed.
+        CAN_INSTALL=true
+        USE_SUDO="sudo"
+    else
+        CAN_INSTALL=false
+    fi
+
+    if [ "$CAN_INSTALL" != true ]; then
+        printf 'Cannot install packages: need root or sudo access. Skipping installs.\n' >&2
+        DO_INSTALL=false
+    fi
 fi
 
 # ---------------------------------------------------------------------------
@@ -85,7 +103,7 @@ if [ "$DO_INSTALL" = true ]; then
 
     # Install stow first so it can be used for config setup
     if ! has_cmd stow; then
-		pkg_install stow
+	pkg_install stow
     fi
 fi
 
