@@ -258,4 +258,3 @@ done
 unset _dir
 
 printf 'Setup complete.\n'
-source ~/.zshrc
